@@ -100,7 +100,7 @@ const movies = {
   "66": { title: "Kino nomi 66", file_id: "FILE_ID_YAZILADI" },
   "67": { title: "Kino nomi 67", file_id: "FILE_ID_YAZILADI" },
   "68": { title: "Kino nomi 68", file_id: "FILE_ID_YAZILADI" },
-  "69": { title: "Ferdinand multfilmi", file_id: "BAACAgIAAxkBAAMXaqbNpPiGvhqmEXUaj1raK_m8h7cAAn2rAAJgoDhJYTsBK8W2c8Y9BA" },
+  "69": { title: "kino nomi 69", file_id: "FILE_ID_YAZILADI" },
   "70": { title: "Kino nomi 70", file_id: "FILE_ID_YAZILADI" },
   "71": { title: "Kino nomi 71", file_id: "FILE_ID_YAZILADI" },
   "72": { title: "Kino nomi 72", file_id: "FILE_ID_YAZILADI" },
