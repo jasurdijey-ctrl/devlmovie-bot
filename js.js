@@ -33,7 +33,7 @@ const bot = new Telegraf(BOT_TOKEN);
 // 🎬 1 DAN 100 GACHA KINOLAR BAZASI
 const movies = {
   "1": { title: "Qasoskorlar: Intihoy", file_id: "BAACAgIAAxkBAPyaqeA3qLG2VubWF1Lwyx36RKS2SEAAsOgAAJgoEBJv7wYX02X4GQ9BA" },
-  "2": { title: "Ferdinand multfilmi", file_id: "BAACAgIAAxkBAAMXaqbNpPiGvhqmEXUaj1raK_m8h7cAAn2rAAJgoDhJYTsBK8W2c8Y9BA" },
+  "2": { title: "Ferdinand multfilmi", file_id: "BAACAgIAAxkBAAIBjGqnlyQ9xPPIDZPJPwI7k6LbYCGiAAK0oQACYKBASabLP9GxaMccPQQ" },
   "3": { title: "Uyda yolgiz 1", file_id: "BAACAgIAAxkBAAMXaqbNpPiGvhqmEXUaj1raK_m8h7cAAn2rAAJgoDhJYTsBK8W2c8Y9BA" },
   "4": { title: "Uyda yolgiz 2", file_id: "FILE_ID_YAZILADI" },
   "5": { title: "Forsaj 10", file_id: "FILE_ID_YAZILADI" },
