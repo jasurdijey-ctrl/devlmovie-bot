@@ -15,9 +15,13 @@ const { Telegraf, Markup } = require('telegraf');
 const BOT_TOKEN = '8885536115:AAG-CihCUvut-hZgBLO81cUBpOmhYQ4EMo';
 const bot = new Telegraf(BOT_TOKEN);
 
-// MAJBURIY GURUH / KANAL
-const CHANNEL_ID = '-1002094929519';
-const CHANNEL_LINK = 'https://t.me/fargona_somsa_xamirlari';
+// 🔹 TEKSHIRILADIGAN KANALLAR RO'YXATI
+// (Xohlagancha kanal qo'shishingiz mumkin)
+const CHANNELS = [
+  { id: '@fargona_somsa_xamirlari', name: '1 - kanal', link: 'https://t.me/fargona_somsa_xamirlari' },
+  // Keyinchalik boshqa kanallar bo'lsa pastidan qo'shasiz:
+  // { id: '@ikkinchi_kanal', name: '2 - kanal', link: 'https://t.me/ikkinchi_kanal' }
+];
 
 // Kinolar bazasi
 const movies = {
@@ -35,29 +39,43 @@ const movies = {
   }
 };
 
-// Obunani tekshirish funksiyasi
-async function checkSubscription(ctx, userId) {
-  try {
-    const member = await ctx.telegram.getChatMember(CHANNEL_ID, userId);
-    
-    // Faqat shu statuslarda bo'lsagina true qaytaradi (a'zo, admin, creator)
-    if (['creator', 'administrator', 'member'].includes(member.status)) {
-      return true;
+// Barcha kanallarga obunani tekshirish funksiyasi
+async function checkAllSubscriptions(ctx, userId) {
+  for (const ch of CHANNELS) {
+    try {
+      const member = await ctx.telegram.getChatMember(ch.id, userId);
+      if (['left', 'kicked'].includes(member.status)) {
+        return false; // Agar bittasidan bo'lsa ham chiqqan bo'lsa, false beradi
+      }
+    } catch (error) {
+      console.error(`Obuna tekshirishda xatolik (${ch.id}):`, error.message);
+      return false; // Xatolik bo'lsa ham obunasiz deb hisoblaydi
     }
-    return false;
-  } catch (error) {
-    console.error('Obuna tekshirishda xatolik:', error.message);
-    // Xatolik yuz bersa HAM false qaytaradi, ya'ni videoni yubormaydi!
-    return false; 
   }
+  return true;
 }
 
-// /start buyrug'i
+// Tugmalarni yasovchi funksiya (Rasmdagidek chiqishi uchun)
+function getSubscriptionKeyboard(movieCode) {
+  const buttons = CHANNELS.map(ch => [Markup.button.url(ch.name, ch.link)]);
+  
+  // Pastiga "✅ Tasdiqlash" tugmasini qo'shamiz
+  buttons.push([Markup.button.callback('✅ Tasdiqlash', `check_${movieCode}`)]);
+
+  return Markup.inlineKeyboard(buttons);
+}
+
+// Ogohlantirish matni (Rasmdagi matn)
+const warningText = `❌ Kechirasiz, botimizdan foydalanish uchun ushbu kanallarga obuna bo'lishingiz kerak.
+
+💎 Yoki «PREMIUM» obunasini sotib oling va botdan hech qanday kanallarga obuna bo'lmasdan cheklovlarsiz foydalaning!`;
+
+// /start buyrug'i uchun
 bot.start((ctx) => {
   ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 69)');
 });
 
-// Xabar kelganda
+// Kino kodi yozilganda
 bot.on('text', async (ctx) => {
   const text = ctx.message.text.trim();
   const userId = ctx.from.id;
@@ -65,7 +83,7 @@ bot.on('text', async (ctx) => {
   if (text.startsWith('/')) return;
 
   if (movies[text]) {
-    const isSubscribed = await checkSubscription(ctx, userId);
+    const isSubscribed = await checkAllSubscriptions(ctx, userId);
 
     if (isSubscribed) {
       await ctx.replyWithVideo(movies[text].file_id, {
@@ -73,26 +91,19 @@ bot.on('text', async (ctx) => {
         parse_mode: 'HTML'
       });
     } else {
-      // Obuna bo'lmagan bo'lsa FAQAT shu tugmalarni chiqaradi!
-      await ctx.reply(
-        `⚠️ Kinoni ko'rish uchun avval guruhimizga obuna bo'ling!`,
-        Markup.inlineKeyboard([
-          [Markup.button.url('📢 Guruhga qo\'shilish', CHANNEL_LINK)],
-          [Markup.button.callback('✅ Obunani tekshirish', `check_${text}`)]
-        ])
-      );
+      await ctx.reply(warningText, getSubscriptionKeyboard(text));
     }
   } else {
     await ctx.reply('❌ Bunday kodli kino topilmadi.');
   }
 });
 
-// "Obunani tekshirish" tugmasi bosilganda
+// "✅ Tasdiqlash" tugmasi bosilganda
 bot.action(/^check_(.+)$/, async (ctx) => {
   const movieCode = ctx.match[1];
   const userId = ctx.from.id;
 
-  const isSubscribed = await checkSubscription(ctx, userId);
+  const isSubscribed = await checkAllSubscriptions(ctx, userId);
 
   if (isSubscribed) {
     await ctx.answerCbQuery('✅ Obuna tasdiqlandi!');
@@ -105,7 +116,7 @@ bot.action(/^check_(.+)$/, async (ctx) => {
       });
     }
   } else {
-    await ctx.answerCbQuery('❌ Siz hali guruhga qo\'shilmadingiz! Avval guruhga a\'zo bo\'ling.', { show_alert: true });
+    await ctx.answerCbQuery('❌ Siz hali barcha kanallarga obuna bo\'lmadingiz!', { show_alert: true });
   }
 });
 
