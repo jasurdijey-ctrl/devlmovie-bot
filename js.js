@@ -27,11 +27,11 @@ setInterval(() => {
 const BOT_TOKEN = '8885536115:AAG-CihCUvut-hZgBLO81cUBpOmhYQ4EMo';
 const bot = new Telegraf(BOT_TOKEN);
 
-// 👥 FOYDALANUVCHILARNI SAQLASH UCHUN BAZA (Set usulida, takrorlanmaydi)
+// 👥 FOYDALANUVCHILARNI SAQLASH UCHUN BAZA
 const users = new Set();
 
 const movies = {
-"62": { title: "Kino nomi 62", file_id: "FILE_ID_YAZILADI" },
+  "62": { title: "Kino nomi 62", file_id: "FILE_ID_YAZILADI" },
   "63": { title: "Kino nomi 63", file_id: "FILE_ID_YAZILADI" },
   "64": { title: "Kino nomi 64", file_id: "FILE_ID_YAZILADI" },
   "65": { title: "Kino nomi 65", file_id: "FILE_ID_YAZILADI" },
@@ -71,18 +71,16 @@ const movies = {
   "99": { title: "Kino nomi 99", file_id: "FILE_ID_YAZILADI" },
   "100": { title: "Kino nomi 100", file_id: "FILE_ID_YAZILADI" }
     };
-
-// 🎬 /start BUYRUG'I (Yangi foydalanuvchini ro'yxatga oladi)
+// 🎬 /start BUYRUG'IX4GQ9BA" },
 bot.start((ctx) => {
-  const userId = ctx.from.id;
-  users.add(userId); // Foydalanuvchi ID'sini bazaga qo'shish
-
+  users.add(ctx.from.id);
   ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 1, 2, 3, 69)');
 });
 
-// 📊 STATISTIKANI KO'RISH BUYRUG'I
-bot.command('stat', (ctx) => {
-  const totalUsers = users.size; // Umumiy odamlar soni
+// 📊 STATISTIKANI KO'RISH BUYRUG'I (/stat yoki stat)
+bot.hears(['/stat', 'stat', 'Stat'], (ctx) => {
+  users.add(ctx.from.id);
+  const totalUsers = users.size;
   ctx.reply(`📊 <b>Bot statistikasi:</b>\n\n👥 Botdan foydalanganlar soni: <b>${totalUsers}</b> ta odam`, {
     parse_mode: 'HTML'
   });
@@ -106,9 +104,9 @@ bot.on('video', (ctx) => {
 bot.on('text', async (ctx) => {
   const text = ctx.message.text.trim();
 
-  // Foydalanuvchi har safar yozganida ham bazaga qo'shib qo'yadi (har ehtimolga qarshi)
   users.add(ctx.from.id);
 
+  // Buyruq bo'lsa o'tkazib yuborish
   if (text.startsWith('/')) return;
 
   if (movies[text] && movies[text].file_id !== "FILE_ID_YAZILADI") {
