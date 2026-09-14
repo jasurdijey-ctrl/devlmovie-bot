@@ -3,30 +3,31 @@ const https = require('https');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Render bergan Web Service linkini shu yerga yozing
-const RENDER_URL = 'https://devlmovie.onrender.com'; // <--- O'zingizning Render URL'ingizni qo'ying
+// Render bergan Web Service havolasini shu yerga yozing
+const RENDER_URL = 'https://devlmovie.onrender.com';
 
 app.get('/', (req, res) => {
-  res.send('Bot 24/7 faol holatda!');
+  res.send('Bot 24/7 ishlayapti!');
 });
 
 app.listen(PORT, () => {
   console.log(`Server ${PORT}-portda ishlayapti`);
 });
 
-// ⚡️ 24/7 UXLATMASLIK TIZIMI (Self-Ping)
-// Har 10 daqiqada server o'ziga-o'zi so'rov yuboradi
+// ⚡️ SERVERNI UXLATMASLIK TIZIMI (Self-Ping)
+// Har 10 daqiqada Render serveriga o'zi so'rov yuborib uxlashga qo'ymaydi
 setInterval(() => {
   https.get(RENDER_URL, (res) => {
     console.log('Self-ping muvaffaqiyatli bajarildi');
   }).on('error', (err) => {
-    console.error('Self-pingda xatolik:', err.message);
+    console.error('Self-ping xatosi:', err.message);
   });
-}, 10 * 60 * 1000); // 10 daqiqa
+}, 10 * 60 * 1000);
 
 const { Telegraf } = require('telegraf');
 
-const BOT_TOKEN = '8885536115:AAG-CihCUvut-hZgBLO81cUBpOmhYQ4EMo';
+// BOT TOKEN (Aniq va to'g'ri ko'rinishi)
+const BOT_TOKEN = '8885536115:AAGok1rkgWhe50fQkSY3hEhglr9V4OVtcQ0';
 const bot = new Telegraf(BOT_TOKEN);
 
 // 🎬 1 DAN 100 GACHA KINOLAR BAZASI
