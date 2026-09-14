@@ -1,14 +1,28 @@
 const express = require('express');
+const https = require('https');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Render bergan Web Service linkini shu yerga yozing
+const RENDER_URL = 'https://devlmovie.onrender.com'; // <--- O'zingizning Render URL'ingizni qo'ying
+
 app.get('/', (req, res) => {
-  res.send('Bot 24/7 ishlayapti!');
+  res.send('Bot 24/7 faol holatda!');
 });
 
 app.listen(PORT, () => {
   console.log(`Server ${PORT}-portda ishlayapti`);
 });
+
+// ⚡️ 24/7 UXLATMASLIK TIZIMI (Self-Ping)
+// Har 10 daqiqada server o'ziga-o'zi so'rov yuboradi
+setInterval(() => {
+  https.get(RENDER_URL, (res) => {
+    console.log('Self-ping muvaffaqiyatli bajarildi');
+  }).on('error', (err) => {
+    console.error('Self-pingda xatolik:', err.message);
+  });
+}, 10 * 60 * 1000); // 10 daqiqa
 
 const { Telegraf } = require('telegraf');
 
@@ -16,16 +30,15 @@ const BOT_TOKEN = '8885536115:AAG-CihCUvut-hZgBLO81cUBpOmhYQ4EMo';
 const bot = new Telegraf(BOT_TOKEN);
 
 // 🎬 1 DAN 100 GACHA KINOLAR BAZASI
-// O'zingizdagi file_id va nomlarni moslab chiqing:
 const movies = {
   "1": { title: "Qasoskorlar: Intihoy", file_id: "BAACAgIAAxkBAPyaqeA3qLG2VubWF1Lwyx36RKS2SEAAsOgAAJgoEBJv7wYX02X4GQ9BA" },
   "2": { title: "Ferdinand multfilmi", file_id: "BAACAgIAAxkBAAMXaqbNpPiGvhqmEXUaj1raK_m8h7cAAn2rAAJgoDhJYTsBK8W2c8Y9BA" },
-  "3": { title: "Uyda yolg'iz 1", file_id: "FILE_ID_YAZILADI" },
-  "4": { title: "Uyda yolg'iz 2", file_id: "FILE_ID_YAZILADI" },
+  "3": { title: "Uyda yolgiz 1", file_id: "BAACAgIAAxkBAAMXaqbNpPiGvhqmEXUaj1raK_m8h7cAAn2rAAJgoDhJYTsBK8W2c8Y9BA" },
+  "4": { title: "Uyda yolgiz 2", file_id: "FILE_ID_YAZILADI" },
   "5": { title: "Forsaj 10", file_id: "FILE_ID_YAZILADI" },
   "6": { title: "Garri Poter 1", file_id: "FILE_ID_YAZILADI" },
   "7": { title: "Avatar 2", file_id: "FILE_ID_YAZILADI" },
-  "8": { title: "O'rgimchak odam", file_id: "FILE_ID_YAZILADI" },
+  "8": { title: "Orgimchak odam", file_id: "FILE_ID_YAZILADI" },
   "9": { title: "Titanik", file_id: "FILE_ID_YAZILADI" },
   "10": { title: "Meteora", file_id: "FILE_ID_YAZILADI" },
   "11": { title: "Kino nomi 11", file_id: "FILE_ID_YAZILADI" },
@@ -120,12 +133,10 @@ const movies = {
   "100": { title: "Kino nomi 100", file_id: "FILE_ID_YAZILADI" }
 };
 
-// /start buyrug'i
 bot.start((ctx) => {
-  ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 1, 2, 69)');
+  ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 1, 2, 3, 69)');
 });
 
-// Foydalanuvchi kino kodini yuborganda
 bot.on('text', async (ctx) => {
   const text = ctx.message.text.trim();
 
@@ -142,7 +153,7 @@ bot.on('text', async (ctx) => {
       await ctx.reply('⚠️ Videoni yuborishda xatolik yuz berdi.');
     }
   } else {
-    await ctx.reply('❌ Bunday kodli kino topilmadi yoki hali yuklanmagan.');
+    await ctx.reply(`❌ ${text} kodli kino topilmadi.`);
   }
 });
 
