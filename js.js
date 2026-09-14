@@ -21,8 +21,8 @@ const users = new Set();
 
 // KINOLAR RO'YXATI (1 dan 50 gacha)
 const movies = {
-  "1": { title: "Kino 1", file_id: "BAACAgIAAxkBAAIBjGqnlyQ9xPPIDZPJPwI7k6LbYCGiAAK0oQACYKBASabLP9GxaMccPQQ" },
-  "2": { title: "Kino 2", file_id: "FILE_ID_YAZILADI" },
+  "2": { title: "Kino 2", file_id: "BAACAgIAAxkBAAIBjGqnlyQ9xPPIDZPJPwI7k6LbYCGiAAK0oQACYKBASabLP9GxaMccPQQ" },
+  "1": { title: "Kino 1", file_id: "FILE_ID_YAZILADI" },
   "3": { title: "Kino 3", file_id: "FILE_ID_YAZILADI" },
   "4": { title: "Kino 4", file_id: "FILE_ID_YAZILADI" },
   "5": { title: "Kino 5", file_id: "FILE_ID_YAZILADI" },
