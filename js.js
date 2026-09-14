@@ -1,5 +1,7 @@
 const express = require('express');
 const https = require('https');
+const { Telegraf } = require('telegraf');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -7,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 const RENDER_URL = 'https://devlmovie.onrender.com';
 
 app.get('/', (req, res) => {
-  res.send('Bot 24/7 ishlayapti!');
+  res.send('Bot 24/7 faol holatda ishlayapti!');
 });
 
 app.listen(PORT, () => {
@@ -24,9 +26,7 @@ setInterval(() => {
   });
 }, 10 * 60 * 1000);
 
-const { Telegraf } = require('telegraf');
-
-// BOT TOKEN (Aniq va to'g'ri ko'rinishi)
+// BOT TOKEN
 const BOT_TOKEN = '8885536115:AAGok1rkgWhe50fQkSY3hEhglr9V4OVtcQ0';
 const bot = new Telegraf(BOT_TOKEN);
 
@@ -134,10 +134,26 @@ const movies = {
   "100": { title: "Kino nomi 100", file_id: "FILE_ID_YAZILADI" }
 };
 
+// /start buyrug'i
 bot.start((ctx) => {
   ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 1, 2, 3, 69)');
 });
 
+// 📥 VIDEO TASHALGANDA FILE_ID VA VAQTINI CHIQARIB BERISH
+bot.on('video', (ctx) => {
+  const fileId = ctx.message.video.file_id;
+  const duration = ctx.message.video.duration;
+
+  const minutes = Math.floor(duration / 60);
+  const seconds = duration % 60;
+  const timeFormatted = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+  ctx.reply(`🎬 <b>Video qabul qilindi!</b>\n\n⏱ <b>Vaqti:</b> ${timeFormatted}\n🔑 <b>file_id:</b>\n<code>${fileId}</code>`, {
+    parse_mode: 'HTML'
+  });
+});
+
+// 📤 FOYDALANUVCHI KOD YUBORGANIDA KINONI YUBORISH
 bot.on('text', async (ctx) => {
   const text = ctx.message.text.trim();
 
