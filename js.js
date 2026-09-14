@@ -1,4 +1,16 @@
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.send('Bot 24/7 ishlayapti!');
+});
+
+app.listen(PORT, () => {
+  console.log(`Server ${PORT}-portda ishlayapti`);
+});
 const { Telegraf } = require('telegraf');
+
 
 const BOT_TOKEN = '8885536115:AAG-CihCUVuvt-hZgBLO8lcUBpOmhYQ4EMo';
 const bot = new Telegraf(BOT_TOKEN);
