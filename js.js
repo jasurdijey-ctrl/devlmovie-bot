@@ -23,7 +23,7 @@ const users = new Set();
 const movies = {
   "2": { title: "Kino 2", file_id: "BAACAgIAAxkBAAIBjGqnlyQ9xPPIDZPJPwI7k6LbYCGiAAK0oQACYKBASabLP9GxaMccPQQ" },
   "1": { title: "Kino 1", file_id: "FILE_ID_YAZILADI" },
-  "3": { title: "Kino 3", file_id: "FILE_ID_YAZILADI" },
+  "3": { title: "Kino 3", file_id: "BAACAgIAAxkBAAIB4mqnslmXGBMOwI0ZE0CLLE8CMCUUAAL4ogACYKBASWebCYjIU02oPQQ" },
   "4": { title: "Kino 4", file_id: "FILE_ID_YAZILADI" },
   "5": { title: "Kino 5", file_id: "FILE_ID_YAZILADI" },
   "6": { title: "Kino 6", file_id: "FILE_ID_YAZILADI" },
