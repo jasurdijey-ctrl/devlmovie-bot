@@ -9,17 +9,21 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server ${PORT}-portda ishlayapti`);
 });
-const { Telegraf } = require('telegraf');
 
+const { Telegraf, Markup } = require('telegraf');
 
-const BOT_TOKEN = '8885536115:AAG-CihCUVuvt-hZgBLO8lcUBpOmhYQ4EMo';
+const BOT_TOKEN = '8885536115:AAG-CihCUvut-hZgBLO81cUBpOmhYQ4EMo';
 const bot = new Telegraf(BOT_TOKEN);
+
+// MAJBURIY KANAL SOZLAMALARI
+const CHANNEL_ID = '@fargona_somsa_xamirlari'; // Kanalizatsiyangiz username'ini yozing (masalan: @my_channel)
+const CHANNEL_LINK = 'https://t.me/fargona_somsa_xamirlari'; // Kanalingiz havolasi
 
 // Kinolar bazasi
 const movies = {
   "1": {
     title: "Qasoskorlar: Intihoy",
-    file_id: "BAACAgIAAxkBAAOhaqdsqQkbYz83BrGNXoMil-HaAugAAnqgAAJgoEBJ9dQAASc-YtR-PQQ" // file_id nusxalab qo'yiladi
+    file_id: "BAACAgIAAxkBAAMXaqbNpPiGvhqmEXUaj1raK_m8h7cAAn2rAAJgoDhJYTsBK8W2c8Y9BA"
   },
   "69": {
     title: "Ferdinand multfilmi",
@@ -31,57 +35,65 @@ const movies = {
   }
 };
 
-
-
-// Start buyrug'i
-bot.start((ctx) => {
-  ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 69)');
-});
-
-// HAR QANDAY XABAR KELGANDA (Video, Fayl, Rasm va h.k.)
-bot.on('message', async (ctx) => {
-  const msg = ctx.message;
-
-  // 1. Agar Video kelgan bo'lsa
-  if (msg.video) {
-    console.log('Video file_id:', msg.video.file_id);
-    return ctx.reply(`✅ Video file_id:\n\n<code>${msg.video.file_id}</code>`, { parse_mode: 'HTML' });
+// Obunani tekshirish funksiyasi
+async function checkSubscription(ctx, userId) {
+  try {
+    const member = await ctx.telegram.getChatMember(CHANNEL_ID, userId);
+    return ['creator', 'administrator', 'member'].includes(member.status);
+  } catch (error) {
+    console.error('Obuna tekshirishda xatolik:', error);
+    return false;
   }
+}
 
-  // 2. Agar Fayl (Document) kelgan bo'lsa
-  if (msg.document) {
-    console.log('Document file_id:', msg.document.file_id);
-    return ctx.reply(`✅ Fayl file_id:\n\n<code>${msg.document.file_id}</code>`, { parse_mode: 'HTML' });
-  }
+// Raqam (kino kodi) yozilganda
+bot.on('text', async (ctx) => {
+  const text = ctx.message.text.trim();
+  const userId = ctx.from.id;
 
-  // 3. Agar Matn (Kod) kelgan bo'lsa
-  if (msg.text && !msg.text.startsWith('/')) {
-    const code = msg.text.trim();
-    console.log('Kelgan kod:', code);
+  // Agar faqat raqam yuborilgan bo'lsa
+  if (movies[text]) {
+    const isSubscribed = await checkSubscription(ctx, userId);
 
-    if (movies[code]) {
-      const movie = movies[code];
-      try {
-        await ctx.replyWithVideo(movie.file_id, { caption: `🎬 <b>${movie.title}</b>`, parse_mode: 'HTML' });
-      } catch (err) {
-        try {
-          await ctx.replyWithDocument(movie.file_id, { caption: `🎬 <b>${movie.title}</b>`, parse_mode: 'HTML' });
-        } catch (e) {
-          ctx.reply(`⚠️ <b>${code}</b>-kino kodi bazada bor, lekin file_id xato yoki qo'yilmagan.`, { parse_mode: 'HTML' });
-        }
-      }
+    if (isSubscribed) {
+      // Obuna bo'lgan bo'lsa - kinoni yuboradi
+      await ctx.replyWithVideo(movies[text].file_id, {
+        caption: `🍿 <b>${movies[text].title}</b>`,
+        parse_mode: 'HTML'
+      });
     } else {
-      ctx.reply(`❌ ${code} kodli kino topilmadi.`);
+      // Obuna bo'lmagan bo'lsa - tugma chiqaradi
+      await ctx.reply(
+        `⚠️ Kinoni ko'rish uchun avval kanalimizga obuna bo'ling!`,
+        Markup.inlineKeyboard([
+          [Markup.button.url('📢 Kanalga obuna bo\'lish', CHANNEL_LINK)],
+          [Markup.button.callback('✅ Obunani tekshirish', `check_${text}`)]
+        ])
+      );
     }
   }
 });
 
-// Botni yuritish
-bot.launch().then(() => {
-  console.log('=== BOT ISHGA TUSHDI VA XABAR KUTYAPTI ===');
-}).catch((err) => {
-  console.error('Xatolik yuz berdi:', err);
+// "Obunani tekshirish" tugmasi bosilganda
+bot.action(/^check_(.+)$/, async (ctx) => {
+  const movieCode = ctx.match[1];
+  const userId = ctx.from.id;
+
+  const isSubscribed = await checkSubscription(ctx, userId);
+
+  if (isSubscribed) {
+    await ctx.answerCbQuery('✅ Obuna tasdiqlandi!');
+    await ctx.deleteMessage(); // Tugmali xabarni o'chirib tashlaydi
+    
+    if (movies[movieCode]) {
+      await ctx.replyWithVideo(movies[movieCode].file_id, {
+        caption: `🍿 <b>${movies[movieCode].title}</b>`,
+        parse_mode: 'HTML'
+      });
+    }
+  } else {
+    await ctx.answerCbQuery('❌ Siz hali kanalga obuna bo\'lmadingiz!', { show_alert: true });
+  }
 });
 
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+bot.launch();
