@@ -36,7 +36,7 @@ const users = new Set();
 
 // 🎬 1 DAN 50 GACHA KINOLAR RO'YXATI
 const movies = {
-  "1": { title: "Kino 1", file_id: "FILE_ID_YAZILADI" },
+  "1": { title: "Kino 1", file_id: "BAACAgIAAxkBAAIBjGqnlyQ9xPPIDZPJPwI7k6LbYCGiAAK0oQACYKBASabLP9GxaMccPQQ" },
   "2": { title: "Kino 2", file_id: "FILE_ID_YAZILADI" },
   "3": { title: "Kino 3", file_id: "FILE_ID_YAZILADI" },
   "4": { title: "Kino 4", file_id: "FILE_ID_YAZILADI" },
