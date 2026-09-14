@@ -1,40 +1,25 @@
 const express = require('express');
 const { Telegraf } = require('telegraf');
-const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Render serverini uyg'otib turuvchi havola
-const RENDER_URL = 'https://devlmovie-bot.onrender.com';
-
-app.use(express.json());
-
 app.get('/', (req, res) => {
-  res.send('Devlmovie Bot Muvaffaqiyatli Ishlamoqda!');
+  res.send('Bot ishlayapti!');
 });
 
 app.listen(PORT, () => {
-  console.log(`Server ${PORT}-portda ishga tushdi`);
+  console.log(`Server ${PORT}-portda ishlayapti`);
 });
 
-// ⚡ SERVERNI UXLATMASLIK TIZIMI (Self-Ping)
-setInterval(() => {
-  https.get(RENDER_URL, (res) => {
-    console.log('Self-ping muvaffaqiyatli bajarildi');
-  }).on('error', (err) => {
-    console.error('Self-pingda xatolik:', err.message);
-  });
-}, 5 * 60 * 1000);
-
-// BOT SOZLAMALARI
-const BOT_TOKEN = '8885536115:AAGxX5UtfVSaAXienklXu5zaipYuBXKeBkM';
+// Telegram Bot Token (BotFather'dan olingan tokenni tekshirib qo'ying)
+const BOT_TOKEN = '8885536115:AAEsrFq6BczFrb-8TFBaR1P1GDG3tg5p1bg';
 const bot = new Telegraf(BOT_TOKEN);
 
-// 👥 FOYDALANUVCHILAR BAZASI
+// Foydalanuvchilar bazasi (Statistika uchun)
 const users = new Set();
 
-// 🎬 1 DAN 50 GACHA KINOLAR RO'YXATI
+// KINOLAR RO'YXATI (1 dan 50 gacha)
 const movies = {
   "1": { title: "Kino 1", file_id: "BAACAgIAAxkBAAIBjGqnlyQ9xPPIDZPJPwI7k6LbYCGiAAK0oQACYKBASabLP9GxaMccPQQ" },
   "2": { title: "Kino 2", file_id: "FILE_ID_YAZILADI" },
@@ -88,27 +73,25 @@ const movies = {
   "50": { title: "Kino 50", file_id: "FILE_ID_YAZILADI" }
 };
 
-// /start BUYRUG'I
+// /start
 bot.start((ctx) => {
   users.add(ctx.from.id);
-  ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 1, 2, 50):');
+  ctx.reply('🍿 Kino botga xush kelibsiz!\nKino kodini yuboring:');
 });
 
-// 📊 STATISTIKA BUYRUG'I
+// Statistika: /stat yoki stat
 bot.hears(['/stat', 'stat', 'Stat'], (ctx) => {
   users.add(ctx.from.id);
-  const totalUsers = users.size;
-  ctx.reply(`📊 Bot statistikasi:\n\n👥 Jami foydalanuvchilar: ${totalUsers} ta`);
+  ctx.reply(`📊 Botdan foydalanganlar soni: ${users.size} ta odam`);
 });
 
-// 📹 VIDEO YUBORILGANDA FILE_ID CHIQARISH
+// Botga video yuborilganda file_id berish
 bot.on('video', (ctx) => {
   const fileId = ctx.message.video.file_id;
-  const duration = ctx.message.video.duration;
-  ctx.reply(`📹 Video yuklandi!\n\n🆔 File ID:\n\`${fileId}\`\n\n⏱ Davomiyligi: ${duration} soniya`, { parse_mode: 'Markdown' });
+  ctx.reply(`🆔 Video file_id:\n\n\`${fileId}\``, { parse_mode: 'Markdown' });
 });
 
-// 📩 KOD YUBORILGANDA KINONI YUBORISH
+// Kod yuborilganda kino yuborish
 bot.on('text', async (ctx) => {
   const text = ctx.message.text.trim();
   users.add(ctx.from.id);
@@ -118,20 +101,14 @@ bot.on('text', async (ctx) => {
   if (movies[text] && movies[text].file_id !== "FILE_ID_YAZILADI") {
     try {
       await ctx.replyWithVideo(movies[text].file_id, {
-        caption: `🎬 **${movies[text].title}**\n\n🍿 Maroqli tomosha qiling!`
+        caption: `🎬 ${movies[text].title}`
       });
-    } catch (error) {
-      ctx.reply('❌ Kinoni yuborishda xatolik yuz berdi.');
+    } catch (err) {
+      ctx.reply('❌ Videoni yuborishda xatolik bo\'ldi.');
     }
   } else {
-    ctx.reply('⚠️ Bunday kodli kino topilmadi yoki kino hali yuklanmagan.');
+    ctx.reply('⚠️ Bunday kodli kino hali joylanmagan.');
   }
 });
 
-// BOTNI ISHGA TUSHIRISH
-bot.launch()
-  .then(() => console.log('Telegram Bot ishga tushdi!'))
-  .catch((err) => console.error('Botni yurgizishda xatolik:', err));
-
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+bot.launch();
