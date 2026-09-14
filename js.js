@@ -19,7 +19,7 @@ const bot = new Telegraf(BOT_TOKEN);
 const movies = {
   "1": {
     title: "Qasoskorlar: Intihoy",
-    file_id: "BAACAgIAAxkBAAMXaqbNpPiGvhqmEXUaj1raK_m8h7cAAn2rAAJgoDhJYTsBK8W2c8Y9BA" // file_id nusxalab qo'yiladi
+    file_id: "BAACAgIAAxkBAAOhaqdsqQkbYz83BrGNXoMil-HaAugAAnqgAAJgoEBJ9dQAASc-YtR-PQQ" // file_id nusxalab qo'yiladi
   },
   "69": {
     title: "Ferdinand multfilmi",
