@@ -15,9 +15,8 @@ const { Telegraf, Markup } = require('telegraf');
 const BOT_TOKEN = '8885536115:AAG-CihCUvut-hZgBLO81cUBpOmhYQ4EMo';
 const bot = new Telegraf(BOT_TOKEN);
 
-// MAJBURIY GURUH SOZLAMALARI
-// 🔴 SHU YERGA @raw_data_bot BERGAN -100 BILAN BASHLANADIGAN GURUH ID'SINI YOZING:
-const CHANNEL_ID = -  -1002094929519; // <-- bu yerga ozizning gurug'ingiz ID'sini qo'ying
+// MAJBURIY GURUH / KANAL
+const CHANNEL_ID = '-1002094929519';
 const CHANNEL_LINK = 'https://t.me/fargona_somsa_xamirlari';
 
 // Kinolar bazasi
@@ -40,26 +39,25 @@ const movies = {
 async function checkSubscription(ctx, userId) {
   try {
     const member = await ctx.telegram.getChatMember(CHANNEL_ID, userId);
-    console.log(`Foydalanuvchi ${userId} statusi:`, member.status);
-
-    // Agar foydalanuvchi guruhdan chiqqan bo'lsa
-    if (['left', 'kicked'].includes(member.status)) {
-      return false;
+    
+    // Faqat shu statuslarda bo'lsagina true qaytaradi (a'zo, admin, creator)
+    if (['creator', 'administrator', 'member'].includes(member.status)) {
+      return true;
     }
-
-    return ['creator', 'administrator', 'member'].includes(member.status);
+    return false;
   } catch (error) {
     console.error('Obuna tekshirishda xatolik:', error.message);
-    return false; // Xatolik bo'lsa ham kinoni ko'rsatmaydi!
+    // Xatolik yuz bersa HAM false qaytaradi, ya'ni videoni yubormaydi!
+    return false; 
   }
 }
 
-// /start buyrug'i uchun
+// /start buyrug'i
 bot.start((ctx) => {
   ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 69)');
 });
 
-// Xabar yuborilganda
+// Xabar kelganda
 bot.on('text', async (ctx) => {
   const text = ctx.message.text.trim();
   const userId = ctx.from.id;
@@ -75,6 +73,7 @@ bot.on('text', async (ctx) => {
         parse_mode: 'HTML'
       });
     } else {
+      // Obuna bo'lmagan bo'lsa FAQAT shu tugmalarni chiqaradi!
       await ctx.reply(
         `⚠️ Kinoni ko'rish uchun avval guruhimizga obuna bo'ling!`,
         Markup.inlineKeyboard([
@@ -83,6 +82,8 @@ bot.on('text', async (ctx) => {
         ])
       );
     }
+  } else {
+    await ctx.reply('❌ Bunday kodli kino topilmadi.');
   }
 });
 
@@ -104,7 +105,7 @@ bot.action(/^check_(.+)$/, async (ctx) => {
       });
     }
   } else {
-    await ctx.answerCbQuery('❌ Siz hali guruhga qo\'shilmadingiz!', { show_alert: true });
+    await ctx.answerCbQuery('❌ Siz hali guruhga qo\'shilmadingiz! Avval guruhga a\'zo bo\'ling.', { show_alert: true });
   }
 });
 
