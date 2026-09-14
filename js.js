@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Render 24/7 uyquga ketmasligi uchun Express server
 app.get('/', (req, res) => {
   res.send('Bot 24/7 ishlayapti!');
 });
@@ -16,8 +15,9 @@ const { Telegraf, Markup } = require('telegraf');
 const BOT_TOKEN = '8885536115:AAG-CihCUvut-hZgBLO81cUBpOmhYQ4EMo';
 const bot = new Telegraf(BOT_TOKEN);
 
-// MAJBURIY KANAL / GURUH SOZLAMALARI
-const CHANNEL_ID = '@fargona_somsa_xamirlari';
+// MAJBURIY GURUH SOZLAMALARI
+// 🔴 SHU YERGA @raw_data_bot BERGAN -100 BILAN BASHLANADIGAN GURUH ID'SINI YOZING:
+const CHANNEL_ID = -  -1002094929519; // <-- bu yerga ozizning gurug'ingiz ID'sini qo'ying
 const CHANNEL_LINK = 'https://t.me/fargona_somsa_xamirlari';
 
 // Kinolar bazasi
@@ -40,26 +40,26 @@ const movies = {
 async function checkSubscription(ctx, userId) {
   try {
     const member = await ctx.telegram.getChatMember(CHANNEL_ID, userId);
-    
-    // Agar foydalanuvchi guruhdan/kanaldan chiqqan bo'lsa
+    console.log(`Foydalanuvchi ${userId} statusi:`, member.status);
+
+    // Agar foydalanuvchi guruhdan chiqqan bo'lsa
     if (['left', 'kicked'].includes(member.status)) {
       return false;
     }
-    
-    // A'zo, admin yoki yaratuvchi bo'lsa
+
     return ['creator', 'administrator', 'member'].includes(member.status);
   } catch (error) {
-    console.error('Obunani tekshirishda xatolik:', error.message);
-    return false; // Xatolik bo'lsa ham obuna bo'lmagan deb hisoblaydi
+    console.error('Obuna tekshirishda xatolik:', error.message);
+    return false; // Xatolik bo'lsa ham kinoni ko'rsatmaydi!
   }
 }
 
-// /start buyrug'i
+// /start buyrug'i uchun
 bot.start((ctx) => {
   ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 69)');
 });
 
-// Foydalanuvchi xabar (kino kodi) yuborganda
+// Xabar yuborilganda
 bot.on('text', async (ctx) => {
   const text = ctx.message.text.trim();
   const userId = ctx.from.id;
@@ -76,9 +76,9 @@ bot.on('text', async (ctx) => {
       });
     } else {
       await ctx.reply(
-        `⚠️ Kinoni ko'rish uchun avval guruhimizga/kanalimizga obuna bo'ling!`,
+        `⚠️ Kinoni ko'rish uchun avval guruhimizga obuna bo'ling!`,
         Markup.inlineKeyboard([
-          [Markup.button.url('📢 Obuna bo\'lish', CHANNEL_LINK)],
+          [Markup.button.url('📢 Guruhga qo\'shilish', CHANNEL_LINK)],
           [Markup.button.callback('✅ Obunani tekshirish', `check_${text}`)]
         ])
       );
@@ -86,7 +86,7 @@ bot.on('text', async (ctx) => {
   }
 });
 
-// "✅ Obunani tekshirish" tugmasi bosilganda
+// "Obunani tekshirish" tugmasi bosilganda
 bot.action(/^check_(.+)$/, async (ctx) => {
   const movieCode = ctx.match[1];
   const userId = ctx.from.id;
@@ -104,7 +104,7 @@ bot.action(/^check_(.+)$/, async (ctx) => {
       });
     }
   } else {
-    await ctx.answerCbQuery('❌ Siz hali obuna bo\'lmadingiz! Avval guruhga/kanalga qo\'shiling.', { show_alert: true });
+    await ctx.answerCbQuery('❌ Siz hali guruhga qo\'shilmadingiz!', { show_alert: true });
   }
 });
 
