@@ -28,7 +28,7 @@ setInterval(() => {
 }, 5 * 60 * 1000);
 
 // BOT SOZLAMALARI
-const BOT_TOKEN = '8885536115:AAG-CihCUvut-hzgBLO81cUBpOmhYQ4EMo';
+const BOT_TOKEN = '8885536115:AAGxX5UtfVSaAXienklXu5zaipYuBXKeBkM';
 const bot = new Telegraf(BOT_TOKEN);
 
 // 👥 FOYDALANUVCHILAR BAZASI
