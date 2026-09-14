@@ -136,7 +136,7 @@ const movies = {
 
 // /start buyrug'i
 bot.start((ctx) => {
-  ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 1, 2, 3, 69)');
+  ctx.reply('🍿 Kino botga xush kelibsiz!\n\nKino kodini yuboring (Masalan: 2, 3,)');
 });
 
 // 📥 VIDEO TASHALGANDA FILE_ID VA VAQTINI CHIQARIB BERISH
